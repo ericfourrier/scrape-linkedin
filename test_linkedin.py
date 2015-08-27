@@ -1,5 +1,5 @@
-from linkedin.scraper import *
-from linkedin.utils import *
+from pylinkedin.scraper import *
+from pylinkedin.utils import *
 import unittest
 import pytest
 import time
