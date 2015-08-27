@@ -1,5 +1,6 @@
 # scrape-linkedin
 [![Travis-CI Build Status](https://travis-ci.org/ericfourrier/scrape-linkedin.svg?branch=master)](https://travis-ci.org/ericfourrier/scrape-linkedin)
+
 Linkedin scraper to get all details on public linkedin profiles.
 
 
