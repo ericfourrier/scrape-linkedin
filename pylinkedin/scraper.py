@@ -15,7 +15,7 @@ Notes :
 
 # Packages
 
-from utils import CustomRequest
+from .utils import CustomRequest
 
 import random
 import json
@@ -40,20 +40,19 @@ def extract_one(l, value = None):
 
 
 def clean(l):
+	""" bad coding for python 3 support """
 	if isinstance(l,list):
 	    if l == []:
 	        return []
 	    else:
-	        l = ([unicode(x).strip().replace(u'\t',u"") for x in l])
+	        l = ([x.strip().replace(u'\t',u"") for x in l])
 	        l =  [x for x in l if x != u""]
 	        l =  [x for x in l if x != u',']
 	        return l
-	elif isinstance(l,str) or isinstance(l,unicode):
-		return l.strip()
 	elif isinstance(l,float) or isinstance(l,int):
 		return l
 	else:
-		return l
+		return l.strip()
 
 def get_first_n(l):
     if l  == []:
