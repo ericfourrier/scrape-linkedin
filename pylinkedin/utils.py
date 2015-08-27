@@ -31,7 +31,7 @@ class CustomRequest(object):
 
 	Returns
 	-------
-	A class with a get methof that is just a customization of requests.get()
+	A class with a get method that is just a customization of requests.get()
 	"""
 
 	def __init__(self,list_user_agent=None,rotate_ua = True,list_proxies = []):
@@ -61,7 +61,12 @@ class CustomRequest(object):
 
 		self.list_proxies = list_proxies
 		self.rotate_ua = rotate_ua
-		self.headers = {}
+		self.headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+       'Accept-Encoding': 'none',
+       'Accept-Language': 'en-US,en;q=0.8',
+       'Connection': 'keep-alive'}
 		self.proxy = {}
 
 	def set_random_ua(self):
@@ -70,12 +75,11 @@ class CustomRequest(object):
 	def set_random_proxy(self):
 	    self.proxy = random.choice(self.list_proxies)
 
-	def get(self,url,use_proxy = False,*args,**kwargs):
+	def get(self,url,*args,**kwargs):
 		if self.rotate_ua is True:
 			self.set_random_ua()
-		if use_proxy:
-		    if self.list_proxies :
-		        self.set_random_proxy()
+		if self.list_proxies :
+		    self.set_random_proxy()
 		    return requests.get(url = url ,headers = self.headers,proxies = self.proxy,*args,**kwargs)
 		else :
 			return requests.get(url = url ,headers = self.headers,*args,**kwargs)
