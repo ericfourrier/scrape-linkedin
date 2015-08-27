@@ -17,7 +17,7 @@ def clock(func):
         t0 = time.time()
         result = func(*args)
         elapsed = (time.time() - t0) * 1000  # in ms
-        print 'elapsed : [{0:0.3f}ms]'.format(elapsed)
+        print ('elapsed : [{0:0.3f}ms]'.format(elapsed))
         return result
 
 
