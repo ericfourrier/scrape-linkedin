@@ -32,7 +32,7 @@ from requests import Request, Session
 # Helpers
 
 def extract_one(l, value = None):
-	""" extract first value if len(l) == 1, value if 0 and return list otherwise """
+	""" Return value if empy list else return first element """
 	if len(l) == 0:
 		return value
 	else:
@@ -140,76 +140,89 @@ class LinkedinItem(object):
 
 	# Header
 
-	def get_profile_img_url(self):
+	@property
+	def profile_img_url(self):
 		return extract_one(self.get_xp(self.xp_header,'.//div[@class="profile-picture"]//img/@src'))
 
-	def get_name(self):
+	@property
+	def name(self):
 		""" Return name of the profile """
 		return extract_one(self.get_xp(self.xp_header,'.//span[@class="full-name"]/text()'))
 
 
-	def get_first_name(self):
+	@property
+	def first_name(self):
 		""" Return first name """
-		name = self.get_name()
-		list_n = name.split() if name is not None else []
+		list_n = self.name.split() if self.name is not None else []
 		return list_n[0] if len(list_n) == 2 else None
 
-	def get_last_name(self):
+	@property
+	def last_name(self):
 		""" Return last name of the profile """
-		name = self.get_name()
-		list_n = name.split() if name is not None else []
+		list_n = self.name.split() if self.name is not None else []
 		return list_n[1] if len(list_n) == 2 else None
 
-	def get_current_title(self):
+	@property
+	def current_title(self):
 		""" Return current title """
 		return extract_one(self.get_xp(self.xp_header,'.//*[@id="headline"]/p/text()'))
 
-	def get_current_location(self):
+	@property
+	def current_location(self):
 		""" Return current location """
 		return extract_one(self.get_xp(self.xp_header,'.//dd/span/text()'))
 
-	def get_current_industry(self):
+	@property
+	def current_industry(self):
 		""" Return current industry """
 		return extract_one(self.get_xp(self.xp_header,'.//dd[@class="industry"]/text()'))
 
-	def get_current_education(self):
+	@property
+	def current_education(self):
 		""" Return current education """
 		name = extract_one(self.get_xp(self.xp_header,'.//tr[@id="overview-summary-education"]//li//text()'))
 		url = extract_one(self.get_xp(self.xp_header,'.//tr[@id="overview-summary-education"]//li/a/@href'))
 		return {u'name':name, u'url':url}
 
-	def get_websites(self):
+	@property
+	def websites(self):
 		""" Return a list of websites of the linkedin member """
 		return self.get_xp(self.xp_header,'.//tr[@id="overview-summary-websites"]//li/a/@href')
 
-	def get_number_connections(self):
+	@property
+	def number_connections(self):
 		""" Return the number of connections """
 		return extract_one(self.get_xp(self.xp_header,'.//div[@class = "member-connections"]//strong//text()'))
 
-	def get_number_recommendations(self):
+	@property
+	def number_recommendations(self):
 		""" Return the number of recommendations """
 		return extract_one(self.get_clean_xpath('.//tr[@id = "overview-recommendation-count"]/td/ol/li/strong[1]/text()'))
 
 	# Interests, Groups  Skills  and Languages
-	def get_interests(self):
+	@property
+	def interests(self):
 		""" Return a list of Interests """
 		return self.get_clean_xpath('//ul[@class="interests-listing"]/li//text()')
 
-	def get_groups(self):
+	@property
+	def groups(self):
 		""" Return a dictionnary of the groups with different parameters (name,img,url) """
 		names = self.get_clean_xpath('//p[@class="groups-name"]/a/img/@alt')
 		imgs = self.get_clean_xpath('//p[@class="groups-name"]/a/img/@src')
 		urls = self.get_clean_xpath('//p[@class="groups-name"]/a[1]/@href')
 		return [{u'name': n, u'img': img, u'url': 'http://www.linkedin.com'+url} for n,img,url in zip(names,imgs,urls)]
 
-	def get_skills(self):
+	@property
+	def skills(self):
 		""" Return a list of skills """
 		#url_skills = self.get_xp(self.skills,'.//span[@class="endorse-item-name-text"]/@href')
 		# [{k:v} for k,v in zip(url_skills,name_skills)]
 		name_skills = self.get_clean_xpath('//div[@id = "profile-skills"]//li//span[@class = "skill-pill"]//text()')
 		return name_skills
 
-	def get_languages(self):
+	@property
+	def languages(self):
 		""" Return a list of dictionnary of languages with proficiency """
 		if isinstance(self.xp_languages,html.HtmlElement) is True:
 			languages_name = self.get_xp(self.xp_languages,'.//li/h4//text()')
@@ -218,23 +231,28 @@ class LinkedinItem(object):
 		else:
 			return {}
 
-	def get_summary(self):
+	@property
+	def summary(self):
 		""" Return the summary of the linkedin profile """
 		return ' '.join(self.get_clean_xpath('//div[@id = "background-summary"]//div[@class = "summary"]/p//text()'))
 
-	def get_recommendations(self):
+	@property
+	def recommendations(self):
 		""" Return a list of description of the recommendations """
 		return self.get_clean_xpath('//div[@id = "recommendations"]//ul/li/div[@class = "description"]/text()')
 
-	def get_volunteering_opportunities(self):
+	@property
+	def volunteering_opportunities(self):
 		""" Return a list of the volunteering causes the linkedin member is looking for """
 		return self.get_clean_xpath('//div[@class="opportunities"]/ul[@class="volunteering-opportunities"]/li/text()')
 
-	def get_volunteering_causes(self):
+	@property
+	def volunteering_causes(self):
 		""" Return a list of the volunteering causes the linkedin member cares bout """
 		return self.get_clean_xpath('//div[@id="volunteering-causes-view"]//ul[@class="volunteering-listing"]/li/text()')
 
-	def get_experiences(self):
+	@property
+	def experiences(self):
 		""" Return a list of dictionnary with experience details """
 		if isinstance(self.xp_experiences,html.HtmlElement) is True:
 			nb_experiences = int(self.get_clean_xpath('count(//div[@id="background-experience"]/div[contains(@id, "experience-")])'))
@@ -260,7 +278,8 @@ class LinkedinItem(object):
 			experiences = []
 		return experiences
 
-	def get_educations(self):
+	@property
+	def educations(self):
 		"""
 		Return a list of dictionnary with education details
 		"""
@@ -293,7 +312,8 @@ class LinkedinItem(object):
 
 		return schools
 
-	def get_projects(self):
+	@property
+	def projects(self):
 		""" Return a list of dictionnary with project details """
 		if isinstance(self.xp_projects,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-projects"]/div[contains(@id, "project-")])'))
@@ -319,7 +339,8 @@ class LinkedinItem(object):
 		return projects
 
 
-	def get_courses(self):
+	@property
+	def courses(self):
 		""" Return a list of dictionnary with courses details """
 		if isinstance(self.xp_courses,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-courses"]//div[@class="section-item"])'))
@@ -335,7 +356,8 @@ class LinkedinItem(object):
 			courses = []
 		return courses
 
-	def get_honors(self):
+	@property
+	def honors(self):
 		""" Return a list of dictionnary with honors and awards details """
 		if isinstance(self.xp_honors,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-honors"]/div[contains(@id, "honors-")])'))
@@ -351,7 +373,8 @@ class LinkedinItem(object):
 			honors = []
 		return honors
 
-	def get_volunteerings(self):
+	@property
+	def volunteerings(self):
 		""" Return a list of dictionnary with volunteering experiences """
 		if isinstance(self.xp_volunteerings,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-volunteering"]//div[@class = "experience"])'))
@@ -369,7 +392,8 @@ class LinkedinItem(object):
 			volunteerings = []
 		return volunteerings
 
-	def get_organizations(self):
+	@property
+	def organizations(self):
 		""" Return a list of dictionnary with organizations """
 		if isinstance(self.xp_organizations,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-organizations"]/div[contains(@id, "organization-")])'))
@@ -387,7 +411,8 @@ class LinkedinItem(object):
 			organizations = []
 		return organizations
 
-	def get_test_scores(self):
+	@property
+	def test_scores(self):
 		""" Return a list of dictionnary with test scores """
 		if isinstance(self.xp_test_scores,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-test-scores"]/div[contains(@id, "scores-")])'))
@@ -403,7 +428,8 @@ class LinkedinItem(object):
 			test_scores = []
 		return test_scores
 
-	def get_certifications(self):
+	@property
+	def certifications(self):
 		""" Return a list of dictionnary with certifications infos """
 		if isinstance(self.xp_certifications,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-certifications"]/div[contains(@id, "certification-")])'))
@@ -420,7 +446,8 @@ class LinkedinItem(object):
 			certifications = []
 		return certifications
 
-	def get_publications(self):
+	@property
+	def publications(self):
 		""" Return a list of dictionnary with publications details """
 		if isinstance(self.xp_publications,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@id="background-publications"]/div[contains(@id, "publication-")])'))
@@ -439,7 +466,8 @@ class LinkedinItem(object):
 			publications = []
 		return publications
 
-	def get_similar_profiles(self):
+	@property
+	def similar_profiles(self):
 		""" Get a list of dictionnaries of profiles from 'people also viewed' on linkedin """
 		if isinstance(self.xp_similar_profiles,html.HtmlElement) is True:
 			count = int(self.get_clean_xpath('count(//div[@class="insights-browse-map"]/ul/li)'))
@@ -459,34 +487,34 @@ class LinkedinItem(object):
 
 	def to_dict(self):
 		data = {
-		u'name': self.get_name(),
-		u'first_name': self.get_first_name(),
-		u'last_name': self.get_last_name(),
-		u'number_connections':self.get_number_connections(),
-		u'number_recommendations':self.get_number_recommendations(),
-		u'websites':self.get_websites(),
-		u'profile_img_url': self.get_profile_img_url(),
-		u'current_education' : self.get_current_education(),
-		u'current_title': self.get_current_title(),
-		u'current_location': self.get_current_location(),
-		u'current_industry': self.get_current_industry(),
-		u'summary': self.get_summary(),
-		u'recommendations': self.get_recommendations(),
-		u'experiences': self.get_experiences(),
-		u'educations': self.get_educations(),
-		u'project': self.get_projects(),
-		u'skills': self.get_skills(),
-		u'courses': self.get_courses(),
-		u'interests': self.get_interests(),
-		u'groups': self.get_groups(),
-		u'languages' : self.get_languages(),
-		u'honors' : self.get_honors(),
-		u'volunteerings': self.get_volunteerings(),
-		u'organizations' : self.get_organizations(),
-		u'test_scores' : self.get_test_scores(),
-		u'certifications':self.get_certifications(),
-		u'publications':self.get_publications(),
-		u'similar_profiles' : self.get_similar_profiles()
+		u'name': self.name,
+		u'first_name': self.first_name,
+		u'last_name': self.last_name,
+		u'number_connections':self.number_connections,
+		u'number_recommendations':self.number_recommendations,
+		u'websites':self.websites,
+		u'profile_img_url': self.profile_img_url,
+		u'current_education' : self.current_education,
+		u'current_title': self.current_title,
+		u'current_location': self.current_location,
+		u'current_industry': self.current_industry,
+		u'summary': self.summary,
+		u'recommendations': self.recommendations,
+		u'experiences': self.experiences,
+		u'educations': self.educations,
+		u'project': self.projects,
+		u'skills': self.skills,
+		u'courses': self.courses,
+		u'interests': self.interests,
+		u'groups': self.groups,
+		u'languages' : self.languages,
+		u'honors' : self.honors,
+		u'volunteerings': self.volunteerings,
+		u'organizations' : self.organizations,
+		u'test_scores' : self.test_scores,
+		u'certifications':self.certifications,
+		u'publications':self.publications,
+		u'similar_profiles' : self.similar_profile
 		}
 		return data
 
