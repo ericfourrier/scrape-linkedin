@@ -39,6 +39,8 @@ class TestConnection(unittest.TestCase):
     def test_get_jeff_weiner(self):
         linkedin = LinkedinItem(url = "https://www.linkedin.com/in/jeffweiner08")
         assert linkedin.response.ok == True
+        assert linkedin.number_connections == u'500+'
+        assert isinstance(linkedin.to_dict(),dict)
 
 
 # class TestLinkedinOffline(unittest.TestCase):
