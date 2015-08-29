@@ -145,7 +145,7 @@ class LinkedinItem(object):
 		return extract_one(self.get_xp(self.xp_header,'.//div[@class="profile-picture"]//img/@src'))
 
 	@property
-	def name(self):
+	def name(self):l
 		""" Return name of the profile """
 		return extract_one(self.get_xp(self.xp_header,'.//span[@class="full-name"]/text()'))
 
@@ -514,7 +514,7 @@ class LinkedinItem(object):
 		u'test_scores' : self.test_scores,
 		u'certifications':self.certifications,
 		u'publications':self.publications,
-		u'similar_profiles' : self.similar_profile
+		u'similar_profiles' : self.similar_profiles
 		}
 		return data
 
