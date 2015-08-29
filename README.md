@@ -21,7 +21,7 @@ Some precautions you should take if you want scrape linkedin with python :
 
 ### Install from source
 `git clone https://github.com/ericfourrier/scrape-linkedin.git`
-go to repo directory and run from the command line `python setup install`
+go to repo directory and run from the command line `python setup.py install`
 
 
 ### Using this package
@@ -32,7 +32,8 @@ It relies on two class:
 
     c = CustomRequest() # default with rotating proxies
     c = CustomRequest(rotating_ua = False) # without rotating proxies
-    c = CustomRequest(list_proxies=[{'https':'http://186.233.94.106:8080','https':'http://186.233.94.106:8080'}]))
+    c = CustomRequest(list_proxies=[{'https':'http://186.233.94.106:8080',
+    'http':'http://186.233.94.106:8080'}]))
 
 `LinkedinItem` is the main class, you can instantiate it with the url or with the response.
 
@@ -43,9 +44,9 @@ It relies on two class:
 
 'LinkedinItem' has the folowing syntax the get the info :
 
-    l.get_name() # to get the name
-    l.get_skills() # to get the skills
-    l.get_publications()  # to get the publications
+    l.name # to get the name
+    l.skills # to get the skills
+    l.publications  # to get the publications
     # etc
     # the most important
     l.to_dict() to scrape all the infos in the profile with a dictionnary format
