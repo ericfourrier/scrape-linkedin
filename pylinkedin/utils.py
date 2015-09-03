@@ -9,12 +9,13 @@ import random
 import time
 
 import requests
-import lxml
 from lxml import html
-from requests import Request, Session
 
-
+#########################################################
 # Helpers
+#########################################################
+
+# Requests with rotating proxies and user-agent
 
 class CustomRequest(object):
 	"""
@@ -84,7 +85,26 @@ class CustomRequest(object):
 			return requests.get(url = url ,headers = self.headers,*args,**kwargs)
 
 
+# Read and write to a pretty json
+def random_delay(static=0.5,variable = 1):
+	time.sleep(static + variable*random.random())
 
+
+def write_to_json(json_file_path,data):
+    with open(json_file_path, "a") as f:
+        f.write("{}\n".format(json.dumps(data)))
+
+
+def read_from_json(json_file_path):
+    data = []
+    with open(json_file_path, "r") as f:
+        for line in f:
+            data.append(json.loads(line))
+    return data
+
+
+
+# Others
 def create_search_url(list_keyword):
 	return '%20'.join(list_keyword)
 

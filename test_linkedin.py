@@ -37,12 +37,42 @@ class TestUtils(unittest.TestCase):
 class TestConnection(unittest.TestCase):
 
     def test_get_jeff_weiner(self):
-        linkedin = LinkedinItem(url = "https://www.linkedin.com/in/jeffweiner08")
-        if linkedin.response.status_code == 200:
-            assert linkedin.number_connections == u'500+'
-            assert isinstance(linkedin.to_dict(),dict)
-        else :
-            print(linkedin.response.status_code)
+        l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
+        self.assertEqual(l.response.status_code,200,msg = l.response.status_code)
+
+
+class TestLinkedinItem(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
+
+    def test_url_detected(self):
+        assert self.l.url_detected == self.l.url
+
+    def test_number_connections(self):
+        assert self.l.number_connections == u'500+'
+
+    def test_name(self):
+        assert self.l.name == u'Jeff Weiner'
+
+    def test_first_name(self):
+        assert self.l.first_name == u'Jeff'
+
+    def test_last_name(self):
+        assert self.l.last_name == u'Weiner'
+
+    def test_to_dict(self):
+        assert isinstance(self.l.to_dict(),dict)
+
+    def test_current_title(self):
+        assert self.l.current_title == u'CEO at LinkedIn'
+
+    def test_current_location(self):
+        assert self.l.current_location == u'Mountain View, California'
+
+    def test_current_industry(self):
+        assert self.l.current_industry == u'Internet'
 
 
 # class TestLinkedinOffline(unittest.TestCase):
