@@ -34,18 +34,18 @@ class TestUtils(unittest.TestCase):
         assert clean(3.0) == 3.0
 
 
-class TestConnection(unittest.TestCase):
+# class TestConnection(unittest.TestCase):
 
-    def test_get_jeff_weiner(self):
-        l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
-        self.assertEqual(l.response.status_code,200,msg = l.response.status_code)
+#     def test_get_jeff_weiner(self):
+#         l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
+#         self.assertEqual(l.response.status_code,200,msg = l.response.status_code)
 
 
 class TestLinkedinItem(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
+        cls.l = LinkedinItem(html_string = read_linkedin_template('jeff_weiner.txt'))
 
     def test_url_detected(self):
         assert self.l.url_detected == self.l.url

@@ -15,6 +15,10 @@ setup(name='scrape-linkedin',
       packages=['pylinkedin'],
       test_suite = 'test_linkedin',
       keywords=['linkedin','api', 'scraper'],
+      include_package_data=True,
+      package_data={
+      'pylinkedin': ['data/*.txt'],
+   }
       zip_safe=False,
       install_requires=[
           'requests>=2.0.0',
