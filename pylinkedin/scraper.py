@@ -298,7 +298,7 @@ class LinkedinItem(object):
                 if end_date:
                     data[u'end_date'] = extract_one(end_date)
                 else:
-                    data[u'end_date'] = unicode(time.strftime("%B-%Y"))
+                    data[u'end_date'] = time.strftime("%B-%Y")
                 experiences.append(data)
         else:
             experiences = []
@@ -335,7 +335,7 @@ class LinkedinItem(object):
                 if end_date:
                     data[u'end_date'] = extract_one(end_date)
                 else:
-                    data[u'end_date'] = unicode(time.strftime("%B-%Y"))
+                    data[u'end_date'] = time.strftime("%B-%Y")
                 schools.append(data)
         else:
             schools = []
