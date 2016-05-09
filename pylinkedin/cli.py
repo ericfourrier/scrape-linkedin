@@ -2,14 +2,10 @@
 Usage: pylinkedin -u url
 Options:
   -u --url : Url of the profile you want to scrape
-  -a --attribute : Display only a specific attribute ()
-  -h --help                         Show this screen.
-  --version
+  -a --attribute : Display only a specific attribute, display everything by default
+  -h --help : Show this screen.
 Examples:
-  skele hello
-Help:
-  For help using this tool, please open an issue on the Github repository:
-  https://github.com/rdegges/skele-cli
+    pylinkedin -u https://www.linkedin.com/in/nadia-freitag-81173966 -a skills
 """
 
 import click

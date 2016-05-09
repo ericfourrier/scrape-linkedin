@@ -40,9 +40,9 @@ def clean(l):
         if l == []:
             return []
         else:
-            l = ([x.strip().replace(u'\t', u"") for x in l])
+            l = ([x.strip().replace('\t', u"") for x in l])
             l = [x for x in l if x != u""]
-            l = [x for x in l if x != u',']
+            l = [x for x in l if x != ',']
             return l
     elif isinstance(l, float) or isinstance(l, int):
         return l
@@ -243,7 +243,7 @@ class LinkedinItem(object):
             self.xp_header, './/tr[@data-section="educationsDetails"]//a//text()'))
         url = extract_one(self.get_xp(
             self.xp_header, './/tr[@data-section="educationsDetails"]//a/@href'))
-        return {u'name': name, u'url': url}
+        return {'name': name, 'url': url}
 
     @property
     def websites(self):
@@ -273,9 +273,9 @@ class LinkedinItem(object):
     def groups(self):
         """ Return a dictionnary of the groups with different parameters (name,img, url) """
         if len(self.xp_groups) > 0:
-            return [{u'name': extract_one(self.get_xp(g, './/h5/a/img/@alt')),
-                    u'img': extract_one(self.get_xp(g, './/h5/a/img/@src')),
-                    u'url': extract_one(self.get_xp(g, './/h4/a/@href'))}
+            return [{'name': extract_one(self.get_xp(g, './/h5/a/img/@alt')),
+                    'img': extract_one(self.get_xp(g, './/h5/a/img/@src')),
+                    'url': extract_one(self.get_xp(g, './/h4/a/@href'))}
                     for g in self.xp_groups]
         else:
             return []
@@ -284,8 +284,8 @@ class LinkedinItem(object):
     def skills(self):
         """ Return a list of skills """
         if len(self.xp_skills) > 0:
-            return [{u'name': extract_one(self.get_xp(s, './a//text()')),
-                    u'url': extract_one(self.get_xp(s, './a/@href'))}
+            return [{'name': extract_one(self.get_xp(s, './a//text()')),
+                    'url': extract_one(self.get_xp(s, './a/@href'))}
                     for s in self.xp_skills]
         else:
             return []
@@ -294,8 +294,8 @@ class LinkedinItem(object):
     def languages(self):
         """ Return a list of dictionnary of languages with proficiency """
         if len(self.xp_languages) > 0:
-            return [{u'name': extract_one(self.get_xp(l, './/h4//text()')),
-                     u'proficiency': extract_one(self.get_xp(l, './/p[@class="proficiency"]/text()'))} for l in self.xp_languages]
+            return [{'name': extract_one(self.get_xp(l, './/h4//text()')),
+                     'proficiency': extract_one(self.get_xp(l, './/p[@class="proficiency"]/text()'))} for l in self.xp_languages]
         else:
             return []
 
@@ -326,29 +326,29 @@ class LinkedinItem(object):
         if len(self.xp_experiences) > 0:
             for experience in self.xp_experiences:
                 data = {}
-                data[u'jobtitle'] = extract_one(
+                data['jobtitle'] = extract_one(
                     self.get_xp(experience, './/h4[@class="item-title"]//text()'))
-                data[u'jobtitle_url'] = extract_one(
+                data['jobtitle_url'] = extract_one(
                     self.get_xp(experience, './/h4[@class="item-title"]/a/@href'))
-                data[u'company'] = extract_one(
+                data['company'] = extract_one(
                     self.get_xp(experience, './/h5[@class="item-subtitle"]/a/text()'))
-                data[u'linkedin_company_url'] = extract_one(
+                data['linkedin_company_url'] = extract_one(
                     self.get_xp(experience, './/h5[@class="item-subtitle"]/a/@href'))
-                data[u'linkedin_company_img_url'] = extract_one(
+                data['linkedin_company_img_url'] = extract_one(
                     self.get_xp(experience, './/h5[@class="logo"]/a/img/@src'))
-                data[u'area'] = extract_one(self.get_xp(
+                data['area'] = extract_one(self.get_xp(
                     experience, './div//span[@class="locality"]/text()'))
-                data[u'description'] = ' '.join(self.get_xp(
+                data['description'] = ' '.join(self.get_xp(
                     experience, './/p[contains(@class,"description")]/text()'))
                 start_date = self.get_xp(
                     experience, './/span[@class="date-range"]/time[1]/text()')
                 end_date = self.get_xp(
                     experience, './/span[@class="date-range"]/time[2]/text()')
-                data[u'start_date'] = extract_one(start_date)
+                data['start_date'] = extract_one(start_date)
                 if end_date:
-                    data[u'end_date'] = extract_one(end_date)
+                    data['end_date'] = extract_one(end_date)
                 else:
-                    data[u'end_date'] = time.strftime("%B-%Y")
+                    data['end_date'] = time.strftime("%B-%Y")
                 experiences.append(data)
         return experiences
 
@@ -361,29 +361,29 @@ class LinkedinItem(object):
         if len(self.xp_educations) > 0:
             for school in self.xp_educations:
                 data = {}
-                data[u'university_name'] = extract_one(self.get_xp(school,
+                data['university_name'] = extract_one(self.get_xp(school,
                     './/h4[@class="item-title"]//text()'))
-                data[u'linkedin_university_url'] = extract_one(self.get_xp(school,
+                data['linkedin_university_url'] = extract_one(self.get_xp(school,
                     './/h4[@class="item-title"]/a/@href'))
-                data[u'linkedin_university_img_url'] = extract_one(self.get_xp(school,
+                data['linkedin_university_img_url'] = extract_one(self.get_xp(school,
                     './/h5[@class="logo"]/a/img/@src'))
-                data[u'description'] = extract_one(self.get_xp(
+                data['description'] = extract_one(self.get_xp(
                     school, './/h5[@class="item-subtitle"]//text()'))
-                if data[u'description'] is not None:
-                    data[u'degree'] = get_list_i(data[u'description'].split(','), 0)
-                    data[u'major'] = get_list_i(data[u'description'].split(','), 1)
+                if data['description'] is not None:
+                    data['degree'] = get_list_i(data['description'].split(','), 0)
+                    data['major'] = get_list_i(data['description'].split(','), 1)
                 else :
-                    data[u'degree'] = None
-                    data[u'major'] = None
+                    data['degree'] = None
+                    data['major'] = None
                 start_date = self.get_xp(
                     school, './/span[@class="date-range"]/time[1]/text()')
                 end_date = self.get_xp(
                     school, './/span[@class="date-range"]/time[2]/text()')
-                data[u'start_date'] = extract_one(start_date)
+                data['start_date'] = extract_one(start_date)
                 if end_date:
-                    data[u'end_date'] = extract_one(end_date)
+                    data['end_date'] = extract_one(end_date)
                 else:
-                    data[u'end_date'] = time.strftime("%B-%Y")
+                    data['end_date'] = time.strftime("%B-%Y")
                 schools.append(data)
         return schools
 
@@ -394,20 +394,20 @@ class LinkedinItem(object):
         if len(self.xp_projects) > 0:
             for project in self.xp_projects:
                 data = {}
-                data[u'title'] = extract_one(self.get_xp(project, './/h4//span[1]/text()'))
-                data[u'url'] = extract_one(self.get_xp(project, './/h4/a/@href'))
-                data[u'description'] = ' '.join(self.get_xp(project, './/p[contains(@class,"description")]//text()'))
+                data['title'] = extract_one(self.get_xp(project, './/h4//span[1]/text()'))
+                data['url'] = extract_one(self.get_xp(project, './/h4/a/@href'))
+                data['description'] = ' '.join(self.get_xp(project, './/p[contains(@class,"description")]//text()'))
                 data['team_members'] = self.get_xp(project, './/dd[@class="associated-endorsements"]//li/a/text()')
                 data['team_members_url'] = self.get_xp(project, './/dd[@class="associated-endorsements"]//li/a/@href')
-                # data[u'team_members'] = [{'name': n, 'url': url} for n,url in
+                # data['team_members'] = [{'name': n, 'url': url} for n,url in
                 # zip(team_members,team_members_url)]
                 start_date = self.get_xp(project, './div//span[@class="date-range"]/time[1]/text()')
                 end_date = self.get_xp(project, './div//span[@class="date-range"]/time[2]/text()')
-                data[u'start_date'] = extract_one(start_date)
+                data['start_date'] = extract_one(start_date)
                 if end_date:
-                    data[u'end_date'] = extract_one(end_date)
+                    data['end_date'] = extract_one(end_date)
                 else:
-                    data[u'end_date'] = time.strftime("%B-%Y")
+                    data['end_date'] = time.strftime("%B-%Y")
                 projects.append(data)
         return projects
 
@@ -419,10 +419,10 @@ class LinkedinItem(object):
         if len(self.xp_courses) > 0:
             for course in self.xp_courses:
                 data={}
-                data[u'university']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/text()'))
-                data[u'university_url']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/@href'))
-                data[u'course_name']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/text()'))
-                data[u'course_number']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/span/text()'))
+                data['university']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/text()'))
+                data['university_url']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/@href'))
+                data['course_name']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/text()'))
+                data['course_number']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/span/text()'))
                 courses.append(data)
         return courses
 
@@ -433,10 +433,10 @@ class LinkedinItem(object):
         if len(self.xp_honors) > 0:
             for honor in self.xp_honors:
                 data={}
-                data[u'title']=extract_one(self.get_xp(honor, './/h4//text()'))
-                data[u'delivred_by']=extract_one(self.get_xp(honor, './/h5//text()'))
-                data[u'description']=' '.join((self.get_xp(honor, './/p[contains(@class,"description")]//text()')))
-                data[u'date']=extract_one(self.get_xp(honor, './/span[@class = "honor-date"]/time/text()'))
+                data['title']=extract_one(self.get_xp(honor, './/h4//text()'))
+                data['delivred_by']=extract_one(self.get_xp(honor, './/h5//text()'))
+                data['description']=' '.join((self.get_xp(honor, './/p[contains(@class,"description")]//text()')))
+                data['date']=extract_one(self.get_xp(honor, './/span[@class = "honor-date"]/time/text()'))
                 honors.append(data)
         return honors
 
@@ -447,12 +447,12 @@ class LinkedinItem(object):
         if len(self.xp_volunteerings) > 0:
             for volunteering in self.xp_volunteerings:
                 data={}
-                data[u'title']=extract_one(self.get_xp(volunteering, './/h4//text()'))
-                data[u'company']=extract_one(self.get_xp(volunteering, './/h5//text()'))
-                data[u'company_url']=extract_one(self.get_xp(volunteering, './/h5//@href'))
-                data[u'description']=' '.join((self.get_xp(volunteering, './/p[contains(@class,"description")]//text()')))
-                data[u'start_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[1]/text()'))
-                data[u'end_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[2]/text()'))
+                data['title']=extract_one(self.get_xp(volunteering, './/h4//text()'))
+                data['company']=extract_one(self.get_xp(volunteering, './/h5//text()'))
+                data['company_url']=extract_one(self.get_xp(volunteering, './/h5//@href'))
+                data['description']=' '.join((self.get_xp(volunteering, './/p[contains(@class,"description")]//text()')))
+                data['start_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[1]/text()'))
+                data['end_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[2]/text()'))
                 volunteerings.append(data)
         return volunteerings
 
@@ -463,10 +463,10 @@ class LinkedinItem(object):
         if len(self.xp_organizations) > 0 :
             for organization in self.xp_organizations:
                 data={}
-                data[u'title']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]//text()'))
-                data[u'title_url']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]/a/@href'))
-                data[u'name']=extract_one(self.get_xp(organization, './/h5[@class="item-subtitle"]//text()'))
-                data[u'description']=' '.join((self.get_xp(organization, './/p[contains(@class,"description")]//text()')))
+                data['title']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]//text()'))
+                data['title_url']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]/a/@href'))
+                data['name']=extract_one(self.get_xp(organization, './/h5[@class="item-subtitle"]//text()'))
+                data['description']=' '.join((self.get_xp(organization, './/p[contains(@class,"description")]//text()')))
                 organizations.append(data)
         return organizations
 
@@ -479,13 +479,13 @@ class LinkedinItem(object):
             test_scores=[]
             for i in range(1, count + 1):
                 data={}
-                data[u'name']=extract_one(
+                data['name']=extract_one(
                     self.get_xp(self.xp_test_scores, './/h4//text()'))
-                data[u'score']=extract_one(
+                data['score']=extract_one(
                     self.get_xp(self.xp_test_scores, './/h5//text()'))
-                data[u'description']=' '.join((self.get_xp(
+                data['description']=' '.join((self.get_xp(
                     self.xp_test_scores, './/p[contains(@class,"description")]//text()')))
-                data[u'date']=extract_one(self.get_xp(
+                data['date']=extract_one(self.get_xp(
                     self.xp_test_scores, './/span[@class = "date-range"]/time[1]/text()'))
                 test_scores.append(data)
         else:
@@ -499,11 +499,11 @@ class LinkedinItem(object):
         if len(self.xp_certifications) > 0:
             for certification in self.xp_certifications:
                 data={}
-                data[u'title']=extract_one(self.get_xp(certification, './/h4/a/text()'))
-                data[u'title_url']=extract_one(self.get_xp(certification, './/h4/a/@href'))
-                data[u'company_name']=extract_one(self.get_xp(certification, './/h5/a/text()'))
-                data[u'linkedin_company_url']=extract_one(self.get_xp(certification, './/h5//@href'))
-                data[u'date']=extract_one(self.get_xp(certification, './/span[@class = "date-range"]/time/text()'))
+                data['title']=extract_one(self.get_xp(certification, './/h4/a/text()'))
+                data['title_url']=extract_one(self.get_xp(certification, './/h4/a/@href'))
+                data['company_name']=extract_one(self.get_xp(certification, './/h5/a/text()'))
+                data['linkedin_company_url']=extract_one(self.get_xp(certification, './/h5//@href'))
+                data['date']=extract_one(self.get_xp(certification, './/span[@class = "date-range"]/time/text()'))
                 certifications.append(data)
         return certifications
 
@@ -514,13 +514,13 @@ class LinkedinItem(object):
         if len(self.xp_publications) > 0:
             for publication in self.xp_publications:
                 data={}
-                data[u'title']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/text()'))
-                data[u'title_url']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/@href'))
-                data[u'source']=extract_one(self.get_xp(publication, './/h5[@class="item-subtitle"]//text()'))
-                #data[u'description']=' '.join((self.get_xp(publication, './/p[contains(@class,"description")]//text()')))
-                data[u'date']=extract_one(self.get_xp(publication, './/span[@class = "date-range"]//text()'))
-                data[u'authors']=self.get_xp(publication, './/dl[@class = "contributors"]//li//text()')
-                data[u'authors_linkedin_profile']=self.get_xp(publication, './/dl[@class = "contributors"]//li//@href')
+                data['title']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/text()'))
+                data['title_url']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/@href'))
+                data['source']=extract_one(self.get_xp(publication, './/h5[@class="item-subtitle"]//text()'))
+                #data['description']=' '.join((self.get_xp(publication, './/p[contains(@class,"description")]//text()')))
+                data['date']=extract_one(self.get_xp(publication, './/span[@class = "date-range"]//text()'))
+                data['authors']=self.get_xp(publication, './/dl[@class = "contributors"]//li//text()')
+                data['authors_linkedin_profile']=self.get_xp(publication, './/dl[@class = "contributors"]//li//@href')
                 publications.append(data)
         return publications
 
@@ -531,10 +531,10 @@ class LinkedinItem(object):
         if len(self.xp_similar_profiles) > 0 :
             for profile in self.xp_similar_profiles:
                 data={}
-                data[u'url']=extract_one(self.get_xp(profile, './div/h4/a/@href'))
-                data[u'name']=extract_one(self.get_xp(profile, './div/h4/a/text()'))
-                data[u'current_title']=extract_one(self.get_xp(profile, './div/p/text()'))
-                data[u'img_url']=extract_one(self.get_xp(profile, './a/img/@data-li-src'))
+                data['url']=extract_one(self.get_xp(profile, './div/h4/a/@href'))
+                data['name']=extract_one(self.get_xp(profile, './div/h4/a/text()'))
+                data['current_title']=extract_one(self.get_xp(profile, './div/p/text()'))
+                data['img_url']=extract_one(self.get_xp(profile, './a/img/@data-li-src'))
                 similar_profiles.append(data)
         return similar_profiles
 
@@ -542,35 +542,35 @@ class LinkedinItem(object):
 
     def to_dict(self):
         data={
-        u'url': self.url,
-        u'url_detected': self.url_detected,
-        u'name': self.name,
-        u'first_name': self.first_name,
-        u'last_name': self.last_name,
-        u'number_connections': self.number_connections,
-        u'number_recommendations': self.number_recommendations,
-        u'websites': self.websites,
-        u'profile_img_url': self.profile_img_url,
-        u'current_education': self.current_education,
-        u'current_title': self.current_title,
-        u'current_location': self.current_location,
-        u'current_industry': self.current_industry,
-        u'summary': self.summary,
-        u'recommendations': self.recommendations,
-        u'experiences': self.experiences,
-        u'educations': self.educations,
-        u'project': self.projects,
-        u'skills': self.skills,
-        u'courses': self.courses,
-        u'interests': self.interests,
-        u'groups': self.groups,
-        u'languages': self.languages,
-        u'honors': self.honors,
-        u'volunteerings': self.volunteerings,
-        u'organizations': self.organizations,
-        u'test_scores': self.test_scores,
-        u'certifications': self.certifications,
-        u'publications': self.publications,
-        u'similar_profiles': self.similar_profiles
+        'url': self.url,
+        'url_detected': self.url_detected,
+        'name': self.name,
+        'first_name': self.first_name,
+        'last_name': self.last_name,
+        'number_connections': self.number_connections,
+        'number_recommendations': self.number_recommendations,
+        'websites': self.websites,
+        'profile_img_url': self.profile_img_url,
+        'current_education': self.current_education,
+        'current_title': self.current_title,
+        'current_location': self.current_location,
+        'current_industry': self.current_industry,
+        'summary': self.summary,
+        'recommendations': self.recommendations,
+        'experiences': self.experiences,
+        'educations': self.educations,
+        'project': self.projects,
+        'skills': self.skills,
+        'courses': self.courses,
+        'interests': self.interests,
+        'groups': self.groups,
+        'languages': self.languages,
+        'honors': self.honors,
+        'volunteerings': self.volunteerings,
+        'organizations': self.organizations,
+        'test_scores': self.test_scores,
+        'certifications': self.certifications,
+        'publications': self.publications,
+        'similar_profiles': self.similar_profiles
         }
         return data
