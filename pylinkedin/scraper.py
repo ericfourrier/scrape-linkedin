@@ -5,6 +5,8 @@
 Purpose : Create a unofficial api to get linkedin employment info with
 http request and DOM parsing.
 
+Scraper for v3-public
+
 Notes :
 
 """
@@ -54,6 +56,15 @@ def get_first_n(l):
     else:
         return l[0]
 
+def get_list_i(l, i):
+    if not isinstance(l, list):
+        return None
+    try :
+        return l[i]
+    except IndexError:
+        return None
+    else:
+        None
 # Constants
 
 # proxy = {"http": "http://123proxysites.science",
@@ -74,7 +85,13 @@ def get_first_n(l):
 
 class LinkedinItem(object):
 
-    attributes_key = [u'volunteerings', u'last_name', u'number_recommendations', u'number_connections', u'current_location', u'honors', u'first_name', u'current_title', u'test_scores', u'current_industry', u'languages', u'similar_profiles', u'interests', u'profile_img_url', u'current_education', u'educations', u'experiences', u'groups', u'organizations', u'certifications', u'name', u'skills', u'websites', u'summary', u'project', u'courses', u'publications', u'recommendations']
+    attributes_key = ['volunteerings', 'last_name', 'number_recommendations',
+                     'number_connections', 'current_location', 'honors', 'first_name',
+                     'current_title', 'test_scores', 'current_industry', 'languages',
+                     'similar_profiles', 'interests', 'profile_img_url', 'current_education',
+                     'educations', 'experiences', 'groups', 'organizations', 'certifications',
+                     'name', 'skills', 'websites', 'summary', 'project', 'courses',
+                     'publications', 'recommendations']
 
     def __init__(self, url=None, html_string=None, crequest=None):
         # if you want put the html text directly
@@ -90,53 +107,45 @@ class LinkedinItem(object):
         else:
             raise ValueError('url or html_string should be defined')
         # Header path
-        self.xp_header = extract_one(
-            self.tree.xpath('.//div[@class = "profile-card vcard"]'))
+        self.xp_header = extract_one(self.tree.xpath('.//div[@class = "profile-card vcard"]'))
         # Experiences path
-        self.xp_experiences = extract_one(
-            self.tree.xpath('//div[@id = "background-experience"]'))
+        self.xp_experiences = self.tree.xpath('//section[@id = "experience"]/ul/li[@class="position"]')
         # Projets
-        self.xp_projects = extract_one(
-            self.tree.xpath('//div[@id = "background-projects"]'))
+        self.xp_projects = self.tree.xpath('//section[@id = "projects"]/ul/li[@class="project"]')
         # Language
-        self.xp_languages = extract_one(
-            self.tree.xpath('//div[@id = "background-languages"]'))
+        self.xp_languages = self.tree.xpath('//section[@id = "languages"]/ul/li[@class="language"]')
         # Volunteering
-        self.xp_volunteerings = extract_one(
-            self.tree.xpath('//div[@id = "background-volunteering"]'))
+        self.xp_volunteerings = self.tree.xpath('//section[@id = "volunteering"]/ul/li[@class="volunteering"]')
         # Organizations
-        self.xp_organizations = extract_one(
-            self.tree.xpath('//div[@id = "background-organizations"]'))
+        self.xp_organizations = self.tree.xpath('//section[@id = "organizations"]/ul/li[@class="organization"]')
         # Honors
-        self.xp_honors = extract_one(self.tree.xpath(
-            '//div[@id = "background-honors"]'))
+        self.xp_honors = self.tree.xpath('//section[@id = "awards"]/ul/li[@class="award"]')
         # Test Scores
-        self.xp_test_scores = extract_one(
-            self.tree.xpath('//div[@id = "background-test-scores"]'))
+        self.xp_test_scores = self.tree.xpath('//section[@id = "test-scores"]/ul/li[@class="publication"]')
         # Publications
-        self.xp_publications = extract_one(
-            self.tree.xpath('//div[@id = "background-publications"]'))
+        self.xp_publications = self.tree.xpath('//section[@id = "publications"]/ul/li[@class="publication"]')
         # Education
-        self.xp_educations = extract_one(
-            self.tree.xpath('//div[@id = "background-education"]'))
+        self.xp_educations = self.tree.xpath('//section[@id = "education"]/ul/li[@class="school"]')
         # Certifications
-        self.xp_certifications = extract_one(
-            self.tree.xpath('//div[@id = "background-certifications"]'))
+        self.xp_certifications = self.tree.xpath('//section[@id = "publication"]/ul/li[@class="certification"]')
         # Courses
-        self.xp_courses = extract_one(
-            self.tree.xpath('//div[@id = "courses"]'))
+        self.xp_courses = self.tree.xpath('//section[@id = "courses"]/ul/li[@class="course"]')
         # Similar profiles
-        self.xp_similar_profiles = extract_one(
-            self.tree.xpath('//div[@class = "insights-browse-map"]'))
+        self.xp_similar_profiles = self.tree.xpath('//div[@class = "browse-map"]/ul/li[@class="profile-card"]')
+        # Publications
+        self.xp_publications = self.tree.xpath('//section[@id = "publications"]/ul/li[@class="publication"]')
+        # Interests
+        self.xp_interests = self.tree.xpath('//section[@id = "interests"]/ul/li[@class="interest"]')
+        # Groups
+        self.xp_groups = self.tree.xpath('//section[@id = "groups"]/ul/li[@class="group"]')
+        # Skills
+        self.xp_skills = self.tree.xpath('//section[@id = "skills"]/ul/li[@class="skill"]')
+        # Organization
+        self.xp_organizations = self.tree.xpath('//section[@id = "organizations"]/ul/li')
         # Summary
-        # self.xp_summary = extract_one(self.tree.xpath('//div[@id = "background-summary"]'))
+        # self.xp_summary = extract_one(self.tree.xpath('//div[@id = "summary"]'))
         # Recommendation
         # self.xp_recommendations = extract_one(self.tree.xpath('//div[@id = "recommendations"]'))
-        # Interests
-        # self.interests = extract_one(self.tree.xpath('//div[@id = "background-interests"]'))
-        # Skills
-        # self.xp_skills = extract_one(self.tree.xpath('//div[@id =
-        # "background-skills"]'))
 
     @staticmethod
     def get_xp(origin, path):
@@ -148,59 +157,98 @@ class LinkedinItem(object):
 
     # Header
 
+    def create_raw_path(self):
+        """ Generate raw path as standard variables """
+        # Header path
+        self.xp_header_raw = extract_one(self.tree.xpath('.//div[@class = "profile-card vcard"]'))
+        # Experiences path
+        self.xp_experiences_raw = extract_one(self.tree.xpath('//section[@id = "experience"]'))
+        # Projets
+        self.xp_projects_raw = extract_one(self.tree.xpath('//section[@id = "projects"]'))
+        # Language
+        self.xp_languages_raw = extract_one(self.tree.xpath('//section[@id = "languages"]'))
+        # Volunteering
+        self.xp_volunteerings_raw = extract_one(self.tree.xpath('//section[@id = "volunteering"]'))
+        # Organizations
+        self.xp_organizations_raw = extract_one(self.tree.xpath('//section[@id = "organizations"]'))
+        # Honors
+        self.xp_honors_raw = extract_one(self.tree.xpath('//section[@id = "honors"]'))
+        # Test Scores
+        self.xp_test_scores_raw = extract_one(self.tree.xpath('//section[@id = "test-scores"]'))
+        # Publications
+        self.xp_publications_raw = extract_one(self.tree.xpath('//section[@id = "publications"]'))
+        # Education
+        self.xp_educations_raw = extract_one(self.tree.xpath('//section[@id = "education"]'))
+        # Certifications
+        self.xp_certifications_raw = extract_one(self.tree.xpath('//section[@id = "certifications"]'))
+        # Courses
+        self.xp_courses_raw = extract_one(self.tree.xpath('//section[@id = "courses"]'))
+        # Similar profiles
+        self.xp_similar_profiles_raw = extract_one(self.tree.xpath('//div[@class = "browse-map"]'))
+        # Interests
+        self.xp_interests_raw = extract_one(self.tree.xpath('//section[@id = "interests"]'))
+        # Groups
+        self.xp_groups_raw = extract_one(self.tree.xpath('//section[@id = "groups"]'))
+        # Skills
+        self.xp_skills_raw = extract_one(self.tree.xpath('//section[@id = "skills"]'))
+        # Organization
+        self.xp_organizations_raw = extract_one(self.tree.xpath('//section[@id = "organizations"]'))
+        # Summary
+
     @property
     def url_detected(self):
         """ Return the url detected on the web page """
         return extract_one(self.tree.xpath('.//head/link[@rel = "canonical"]/@href'))
+
     @property
     def profile_img_url(self):
-        return extract_one(self.get_xp(self.xp_header, './/div[@class="profile-picture"]//img/@src'))
+        return extract_one(self.get_xp(self.xp_header, './/div[@class="profile-picture"]/a/img/@src'))
 
     @property
     def name(self):
         """ Return name of the profile """
-        return extract_one(self.get_xp(self.xp_header, './/span[@class="full-name"]/text()'))
+        return extract_one(self.get_xp(self.xp_header, './/h1[@id="name"]/text()'))
 
     @property
     def first_name(self):
         """ Return first name """
-        list_n = self.name.split() if self.name is not None else []
-        return list_n[0] if len(list_n) == 2 else None
+        first_name = self.name.split(' ', 1)[0] if self.name is not None else []
+        return first_name
 
     @property
     def last_name(self):
         """ Return last name of the profile """
-        list_n = self.name.split() if self.name is not None else []
-        return list_n[1] if len(list_n) == 2 else None
+        last_name = self.name.split(' ', 1)[1] if self.name is not None else []
+        return last_name
 
     @property
     def current_title(self):
         """ Return current title """
-        return extract_one(self.get_xp(self.xp_header, './/*[@id="headline"]/p/text()'))
+        return extract_one(self.get_xp(self.xp_header, './/p[@class="headline title"]/text()'))
 
     @property
     def current_location(self):
         """ Return current location """
-        return extract_one(self.get_xp(self.xp_header, './/dd/span/text()'))
+        return extract_one(self.get_xp(self.xp_header, './/dl[@id="demographics"]/dd[@class="descriptor adr"]/span/text()'))
 
     @property
     def current_industry(self):
         """ Return current industry """
-        return extract_one(self.get_xp(self.xp_header, './/dd[@class="industry"]/text()'))
+        return extract_one(self.get_xp(self.xp_header, './/dl[@id="demographics"]/dd[@class="descriptor"]/text()'))
 
     @property
     def current_education(self):
         """ Return current education """
         name = extract_one(self.get_xp(
-            self.xp_header, './/tr[@id="overview-summary-education"]//li//text()'))
+            self.xp_header, './/tr[@data-section="educationsDetails"]//a//text()'))
         url = extract_one(self.get_xp(
-            self.xp_header, './/tr[@id="overview-summary-education"]//li/a/@href'))
+            self.xp_header, './/tr[@data-section="educationsDetails"]//a/@href'))
         return {u'name': name, u'url': url}
 
     @property
     def websites(self):
         """ Return a list of websites of the linkedin member """
-        return self.get_xp(self.xp_header, './/tr[@id="overview-summary-websites"]//li/a/@href')
+        return self.get_xp(self.xp_header, './/tr[@class="websites"]//li/a/@href')
 
     @property
     def number_connections(self):
@@ -210,40 +258,44 @@ class LinkedinItem(object):
     @property
     def number_recommendations(self):
         """ Return the number of recommendations """
-        return extract_one(self.get_clean_xpath('.//tr[@id = "overview-recommendation-count"]/td/ol/li/strong[1]/text()'))
+        return extract_one(self.get_clean_xpath('//table[@class="extra-info"]//th[contains(text(),"Recommendations")]/following::td/strong[1]/text()'))
 
     # Interests, Groups  Skills  and Languages
     @property
     def interests(self):
         """ Return a list of Interests """
-        return self.get_clean_xpath('//ul[@class="interests-listing"]/li//text()')
+        if len(self.xp_interests) > 0:
+            return [extract_one(self.get_xp(i, './/text()')) for i in self.xp_interests]
+        else:
+            return []
 
     @property
     def groups(self):
         """ Return a dictionnary of the groups with different parameters (name,img, url) """
-        names = self.get_clean_xpath('//p[@class="groups-name"]/a/img/@alt')
-        imgs = self.get_clean_xpath('//p[@class="groups-name"]/a/img/@src')
-        urls = self.get_clean_xpath('//p[@class="groups-name"]/a[1]/@href')
-        return [{u'name': n, u'img': img, u'url': 'http://www.linkedin.com' + url} for n, img, url in zip(names, imgs, urls)]
+        if len(self.xp_groups) > 0:
+            return [{u'name': extract_one(self.get_xp(g, './/h5/a/img/@alt')),
+                    u'img': extract_one(self.get_xp(g, './/h5/a/img/@src')),
+                    u'url': extract_one(self.get_xp(g, './/h4/a/@href'))}
+                    for g in self.xp_groups]
+        else:
+            return []
 
     @property
     def skills(self):
         """ Return a list of skills """
-        skills = self.tree.xpath('//div[@id = "profile-skills"]//li//span[@class = "skill-pill"]')
-        if len(skills) > 0:
-            return [{u'name':extract_one(self.get_xp(s, './/text()')),
-                    u'url': extract_one(self.get_xp(s, './/a/@href'))}
-                    for s in skills]
+        if len(self.xp_skills) > 0:
+            return [{u'name': extract_one(self.get_xp(s, './a//text()')),
+                    u'url': extract_one(self.get_xp(s, './a/@href'))}
+                    for s in self.xp_skills]
         else:
             return []
 
     @property
     def languages(self):
         """ Return a list of dictionnary of languages with proficiency """
-        if isinstance(self.xp_languages, html.HtmlElement) is True:
-            languages = self.xp_languages.xpath('.//ol/li')
-            return [{u'name': extract_one(self.get_xp(l, './h4//text()')),
-                     u'proficiency': extract_one(self.get_xp(l, './div//text()'))}for l in languages]
+        if len(self.xp_languages) > 0:
+            return [{u'name': extract_one(self.get_xp(l, './/h4//text()')),
+                     u'proficiency': extract_one(self.get_xp(l, './/p[@class="proficiency"]/text()'))} for l in self.xp_languages]
         else:
             return []
 
@@ -270,38 +322,34 @@ class LinkedinItem(object):
     @property
     def experiences(self):
         """ Return a list of dictionnary with experience details """
-        if isinstance(self.xp_experiences, html.HtmlElement) is True:
-            nb_experiences = int(self.get_clean_xpath(
-                'count(//div[@id="background-experience"]/div[contains(@id, "experience-")])'))
-            experiences = []
-            for i in range(1, nb_experiences + 1):
+        experiences = []
+        if len(self.xp_experiences) > 0:
+            for experience in self.xp_experiences:
                 data = {}
                 data[u'jobtitle'] = extract_one(
-                    self.get_xp(self.xp_experiences, './div[%s]/div//h4//text()' % i))
+                    self.get_xp(experience, './/h4[@class="item-title"]//text()'))
                 data[u'jobtitle_url'] = extract_one(
-                    self.get_xp(self.xp_experiences, './div[%s]/div//h4/a/@href' % i))
+                    self.get_xp(experience, './/h4[@class="item-title"]/a/@href'))
                 data[u'company'] = extract_one(
-                    self.get_xp(self.xp_experiences, './div[%s]/div//h5[2]/a/text()' % i))
+                    self.get_xp(experience, './/h5[@class="item-subtitle"]/a/text()'))
                 data[u'linkedin_company_url'] = extract_one(
-                    self.get_xp(self.xp_experiences, './div[%s]/div//h5[2]/a/@href' % i))
+                    self.get_xp(experience, './/h5[@class="item-subtitle"]/a/@href'))
                 data[u'linkedin_company_img_url'] = extract_one(
-                    self.get_xp(self.xp_experiences, './div[%s]/div//img/@src' % i))
+                    self.get_xp(experience, './/h5[@class="logo"]/a/img/@src'))
                 data[u'area'] = extract_one(self.get_xp(
-                    self.xp_experiences, './div[%s]/div//span[@class="locality"]/text()' % i))
+                    experience, './div//span[@class="locality"]/text()'))
                 data[u'description'] = ' '.join(self.get_xp(
-                    self.xp_experiences, './div[%s]//p[contains(@class,"description")]/text()' % i))
+                    experience, './/p[contains(@class,"description")]/text()'))
                 start_date = self.get_xp(
-                    self.xp_experiences, './div[%s]/div//span[@class="experience-date-locale"]/time[1]/text()' % i)
+                    experience, './/span[@class="date-range"]/time[1]/text()')
                 end_date = self.get_xp(
-                    self.xp_experiences, './div[%s]/div//span[@class="experience-date-locale"]/time[2]/text()' % i)
+                    experience, './/span[@class="date-range"]/time[2]/text()')
                 data[u'start_date'] = extract_one(start_date)
                 if end_date:
                     data[u'end_date'] = extract_one(end_date)
                 else:
                     data[u'end_date'] = time.strftime("%B-%Y")
                 experiences.append(data)
-        else:
-            experiences = []
         return experiences
 
     @property
@@ -309,169 +357,117 @@ class LinkedinItem(object):
         """
         Return a list of dictionnary with education details
         """
-        if isinstance(self.xp_educations, html.HtmlElement) is True:
-            count = int(self.get_clean_xpath(
-                'count(//div[@id="background-education"]/div[contains(@id, "education-")])'))
-            schools = []
-            for i in range(1, count + 1):
+        schools = []
+        if len(self.xp_educations) > 0:
+            for school in self.xp_educations:
                 data = {}
-                data[u'degree'] = extract_one(self.get_xp(self.xp_educations,
-                    './div[%s]//span[@class="degree"]//text()' % i))
-                data[u'major'] = extract_one(self.get_xp(self.xp_educations,
-                    './div[%s]//span[@class="major"]//text()' % i))
-                data[u'university_name'] = extract_one(self.get_xp(self.xp_educations,
-                    './div[%s]//h4//text()' % i))
-                data[u'linkedin_university_url'] = extract_one(self.get_xp(self.xp_educations,
-                    './div[%s]/div//h4/a/@href' % i))
-                data[u'linkedin_university_img_url'] = extract_one(self.get_xp(self.xp_educations,
-                    './div[%s]/div//img/@src' % i))
-                data[u'description'] = ' '.join(self.get_xp(
-                    self.xp_educations, './div[%s]//p[contains(@class,"notes")]/text()' % i))
+                data[u'university_name'] = extract_one(self.get_xp(school,
+                    './/h4[@class="item-title"]//text()'))
+                data[u'linkedin_university_url'] = extract_one(self.get_xp(school,
+                    './/h4[@class="item-title"]/a/@href'))
+                data[u'linkedin_university_img_url'] = extract_one(self.get_xp(school,
+                    './/h5[@class="logo"]/a/img/@src'))
+                data[u'description'] = extract_one(self.get_xp(
+                    school, './/h5[@class="item-subtitle"]//text()'))
+                if data[u'description'] is not None:
+                    data[u'degree'] = get_list_i(data[u'description'].split(','), 0)
+                    data[u'major'] = get_list_i(data[u'description'].split(','), 1)
+                else :
+                    data[u'degree'] = None
+                    data[u'major'] = None
                 start_date = self.get_xp(
-                    self.xp_educations, './div[%s]//span[@class="education-date"]/time[1]/text()' % i)
+                    school, './/span[@class="date-range"]/time[1]/text()')
                 end_date = self.get_xp(
-                    self.xp_educations, './div[%s]//span[@class="education-date"]/time[2]/text()' % i)
+                    school, './/span[@class="date-range"]/time[2]/text()')
                 data[u'start_date'] = extract_one(start_date)
                 if end_date:
                     data[u'end_date'] = extract_one(end_date)
                 else:
                     data[u'end_date'] = time.strftime("%B-%Y")
                 schools.append(data)
-        else:
-            schools = []
-
         return schools
 
     @property
     def projects(self):
         """ Return a list of dictionnary with project details """
-        if isinstance(self.xp_projects, html.HtmlElement) is True:
-            count = int(self.get_clean_xpath(
-                'count(//div[@id="background-projects"]/div[contains(@id, "project-")])'))
-            projects = []
-            for i in range(1, count + 1):
+        projects = []
+        if len(self.xp_projects) > 0:
+            for project in self.xp_projects:
                 data = {}
-                data[u'title'] = extract_one(
-                    self.get_xp(self.xp_projects, './div[%s]//h4//span[1]/text()' % i))
-                data[u'url'] = extract_one(
-                    self.get_xp(self.xp_projects, './div[%s]//h4/a/@href' % i))
-                data[u'description'] = ' '.join(self.get_xp(
-                    self.xp_projects, './div[%s]//p[contains(@class,"description")]//text()' % i))
-                data['team_members'] = self.get_xp(
-                    self.xp_projects, './div[%s]//dd[@class="associated-endorsements"]//li/a/text()' % i)
-                data['team_members_url'] = self.get_xp(
-                    self.xp_projects, './div[%s]//dd[@class="associated-endorsements"]//li/a/@href' % i)
+                data[u'title'] = extract_one(self.get_xp(project, './/h4//span[1]/text()'))
+                data[u'url'] = extract_one(self.get_xp(project, './/h4/a/@href'))
+                data[u'description'] = ' '.join(self.get_xp(project, './/p[contains(@class,"description")]//text()'))
+                data['team_members'] = self.get_xp(project, './/dd[@class="associated-endorsements"]//li/a/text()')
+                data['team_members_url'] = self.get_xp(project, './/dd[@class="associated-endorsements"]//li/a/@href')
                 # data[u'team_members'] = [{'name': n, 'url': url} for n,url in
                 # zip(team_members,team_members_url)]
-                start_date = self.get_xp(
-                    self.xp_projects, './div[%s]/div//span[@class="projects-date"]/time[1]/text()' % i)
-                end_date = self.get_xp(
-                    self.xp_projects, './div[%s]/div//span[@class="projects-date"]/time[2]/text()' % i)
+                start_date = self.get_xp(project, './div//span[@class="date-range"]/time[1]/text()')
+                end_date = self.get_xp(project, './div//span[@class="date-range"]/time[2]/text()')
                 data[u'start_date'] = extract_one(start_date)
                 if end_date:
                     data[u'end_date'] = extract_one(end_date)
                 else:
                     data[u'end_date'] = time.strftime("%B-%Y")
                 projects.append(data)
-        else:
-            return []
         return projects
 
 
     @property
     def courses(self):
         """ Return a list of dictionnary with courses details """
-        if isinstance(self.xp_courses, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-courses"]//div[@class="section-item"])'))
-            courses=[]
-            for i in range(1, count + 1):
+        courses=[]
+        if len(self.xp_courses) > 0:
+            for course in self.xp_courses:
                 data={}
-                data[u'university']=extract_one(self.get_xp(
-                    self.xp_courses, './/div[@id="courses-view"]/div[%s]//h4/a/text()' % i))
-                data[u'university_url']=extract_one(self.get_xp(
-                    self.xp_courses, './/div[@id="courses-view"]/div[%s]//h4/a/@href' % i))
-                data[u'course_name']=extract_one(self.get_xp(
-                    self.xp_courses, './/div[@id="courses-view"]/div[%s]//li/text()' % i))
-                data[u'course_number']=extract_one(self.get_xp(
-                    self.xp_courses, './/div[@id="courses-view"]/div[%s]//li/span/text()' % i))
+                data[u'university']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/text()'))
+                data[u'university_url']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//h4/a/@href'))
+                data[u'course_name']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/text()'))
+                data[u'course_number']=extract_one(self.get_xp(course, './/div[@id="courses-view"]//li/span/text()'))
                 courses.append(data)
-        else:
-            courses=[]
         return courses
 
     @property
     def honors(self):
         """ Return a list of dictionnary with honors and awards details """
-        if isinstance(self.xp_honors, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-honors"]/div[contains(@id, "honors-")])'))
-            honors=[]
-            for i in range(1, count + 1):
+        honors=[]
+        if len(self.xp_honors) > 0:
+            for honor in self.xp_honors:
                 data={}
-                data[u'title']=extract_one(
-                    self.get_xp(self.xp_honors, './div[%s]//h4//text()' % i))
-                data[u'delivred_by']=extract_one(
-                    self.get_xp(self.xp_honors, './div[%s]//h5//text()' % i))
-                data[u'description']=' '.join((self.get_xp(
-                    self.xp_honors, './div[%s]//p[contains(@class,"description")]//text()' % i)))
-                data[u'date']=extract_one(self.get_xp(
-                    self.xp_honors, './div[%s]//span[@class = "honor-date"]/time/text()' % i))
+                data[u'title']=extract_one(self.get_xp(honor, './/h4//text()'))
+                data[u'delivred_by']=extract_one(self.get_xp(honor, './/h5//text()'))
+                data[u'description']=' '.join((self.get_xp(honor, './/p[contains(@class,"description")]//text()')))
+                data[u'date']=extract_one(self.get_xp(honor, './/span[@class = "honor-date"]/time/text()'))
                 honors.append(data)
-        else:
-            honors=[]
         return honors
 
     @property
     def volunteerings(self):
         """ Return a list of dictionnary with volunteering experiences """
-        if isinstance(self.xp_volunteerings, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-volunteering"]//div[@class = "experience"])'))
-            volunteerings=[]
-            for i in range(1, count + 1):
+        volunteerings=[]
+        if len(self.xp_volunteerings) > 0:
+            for volunteering in self.xp_volunteerings:
                 data={}
-                data[u'title']=extract_one(
-                    self.get_xp(self.xp_volunteerings, './div[%s]//h4//text()' % i))
-                data[u'company']=extract_one(
-                    self.get_xp(self.xp_volunteerings, './div[%s]//h5//text()' % i))
-                data[u'company_url']=extract_one(
-                    self.get_xp(self.xp_volunteerings, './div[%s]//h5//@href' % i))
-                data[u'description']=' '.join((self.get_xp(
-                    self.xp_volunteerings, './div[%s]//p[contains(@class,"description")]//text()' % i)))
-                data[u'start_date']=extract_one(self.get_xp(
-                    self.xp_volunteerings, './div[%s]//span[@class = "volunteering-date-cause"]/time[1]/text()' % i))
-                data[u'end_date']=extract_one(self.get_xp(
-                    self.xp_volunteerings, './div[%s]//span[@class = "volunteering-date-cause"]/time[2]/text()' % i))
+                data[u'title']=extract_one(self.get_xp(volunteering, './/h4//text()'))
+                data[u'company']=extract_one(self.get_xp(volunteering, './/h5//text()'))
+                data[u'company_url']=extract_one(self.get_xp(volunteering, './/h5//@href'))
+                data[u'description']=' '.join((self.get_xp(volunteering, './/p[contains(@class,"description")]//text()')))
+                data[u'start_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[1]/text()'))
+                data[u'end_date']=extract_one(self.get_xp(volunteering, './/span[@class = "date-range"]/time[2]/text()'))
                 volunteerings.append(data)
-        else:
-            volunteerings=[]
         return volunteerings
 
     @property
     def organizations(self):
         """ Return a list of dictionnary with organizations """
-        if isinstance(self.xp_organizations, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-organizations"]/div[contains(@id, "organization-")])'))
-            organizations=[]
-            for i in range(1, count + 1):
+        organizations=[]
+        if len(self.xp_organizations) > 0 :
+            for organization in self.xp_organizations:
                 data={}
-                data[u'title']=extract_one(
-                    self.get_xp(self.xp_organizations, './div[%s]//h5//text()' % i))
-                data[u'name']=extract_one(
-                    self.get_xp(self.xp_organizations, './div[%s]//h4//text()' % i))
-                data[u'url']=extract_one(
-                    self.get_xp(self.xp_organizations, './div[%s]//h5//@href' % i))
-                data[u'description']=' '.join((self.get_xp(
-                    self.xp_organizations, './div[%s]//p[contains(@class,"description")]//text()' % i)))
-                data[u'start_date']=extract_one(self.get_xp(
-                    self.xp_organizations, './div[%s]//span[@class = "organizations-date"]/time[1]/text()' % i))
-                data[u'end_date']=extract_one(self.get_xp(
-                    self.xp_organizations, './div[%s]//span[@class = "organizations-date"]/time[2]/text()' % i))
+                data[u'title']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]//text()'))
+                data[u'title_url']=extract_one(self.get_xp(organization, './/h4[@class="item-title"]/a/@href'))
+                data[u'name']=extract_one(self.get_xp(organization, './/h5[@class="item-subtitle"]//text()'))
+                data[u'description']=' '.join((self.get_xp(organization, './/p[contains(@class,"description")]//text()')))
                 organizations.append(data)
-        else:
-            organizations=[]
         return organizations
 
     @property
@@ -484,13 +480,13 @@ class LinkedinItem(object):
             for i in range(1, count + 1):
                 data={}
                 data[u'name']=extract_one(
-                    self.get_xp(self.xp_test_scores, './div[%s]//h4//text()' % i))
+                    self.get_xp(self.xp_test_scores, './/h4//text()'))
                 data[u'score']=extract_one(
-                    self.get_xp(self.xp_test_scores, './div[%s]//h5//text()' % i))
+                    self.get_xp(self.xp_test_scores, './/h5//text()'))
                 data[u'description']=' '.join((self.get_xp(
-                    self.xp_test_scores, './div[%s]//p[contains(@class,"description")]//text()' % i)))
+                    self.xp_test_scores, './/p[contains(@class,"description")]//text()')))
                 data[u'date']=extract_one(self.get_xp(
-                    self.xp_test_scores, './div[%s]//span[@class = "test-scores-date"]/time[1]/text()' % i))
+                    self.xp_test_scores, './/span[@class = "date-range"]/time[1]/text()'))
                 test_scores.append(data)
         else:
             test_scores=[]
@@ -499,76 +495,47 @@ class LinkedinItem(object):
     @property
     def certifications(self):
         """ Return a list of dictionnary with certifications infos """
-        if isinstance(self.xp_certifications, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-certifications"]/div[contains(@id, "certification-")])'))
-            certifications=[]
-            for i in range(1, count + 1):
+        certifications=[]
+        if len(self.xp_certifications) > 0:
+            for certification in self.xp_certifications:
                 data={}
-                data[u'title']=extract_one(
-                    self.get_xp(self.xp_certifications, './div[%s]//h4/a/text()' % i))
-                data[u'title_url']=extract_one(
-                    self.get_xp(self.xp_certifications, './div[%s]//h4/a/@href' % i))
-                data[u'company_name']=extract_one(
-                    self.get_xp(self.xp_certifications, './div[%s]//h5/a/text()' % i))
-                data[u'linkedin_company_url']=extract_one(
-                    self.get_xp(self.xp_certifications, './div[%s]//h5//@href' % i))
-                data[u'date']=extract_one(self.get_xp(
-                    self.xp_certifications, './div[%s]//span[@class = "certification-date"]/time/text()' % i))
+                data[u'title']=extract_one(self.get_xp(certification, './/h4/a/text()'))
+                data[u'title_url']=extract_one(self.get_xp(certification, './/h4/a/@href'))
+                data[u'company_name']=extract_one(self.get_xp(certification, './/h5/a/text()'))
+                data[u'linkedin_company_url']=extract_one(self.get_xp(certification, './/h5//@href'))
+                data[u'date']=extract_one(self.get_xp(certification, './/span[@class = "date-range"]/time/text()'))
                 certifications.append(data)
-        else:
-            certifications=[]
         return certifications
 
     @property
-
     def publications(self):
         """ Return a list of dictionnary with publications details """
-        if isinstance(self.xp_publications, html.HtmlElement) is True:
-            count=int(self.get_clean_xpath(
-                'count(//div[@id="background-publications"]/div[contains(@id, "publication-")])'))
-            publications=[]
-            for i in range(1, count + 1):
+        publications = []
+        if len(self.xp_publications) > 0:
+            for publication in self.xp_publications:
                 data={}
-                data[u'title']=extract_one(
-                    self.get_xp(self.xp_publications, './div[%s]//h4//span[1]/text()' % i))
-                data[u'title_url']=extract_one(
-                    self.get_xp(self.xp_publications, './div[%s]//h4//@href' % i))
-                data[u'source']=extract_one(
-                    self.get_xp(self.xp_publications, './div[%s]//h5//text()' % i))
-                data[u'description']=' '.join((self.get_xp(
-                    self.xp_publications, './div[%s]//p[contains(@class,"description")]//text()' % i)))
-                data[u'date']=extract_one(self.get_xp(
-                    self.xp_publications, './div[%s]//span[@class = "publication-date"]//text()' % i))
-                data[u'authors']=extract_one(self.get_xp(
-                    self.xp_publications, './div[%s]//dd[@class = "associated-endorsements"]//li//text()' % i))
-                data[u'authors_linkedin_profile']=extract_one(self.get_xp(
-                    self.xp_publications, './div[%s]//dd[@class = "associated-endorsements"]//li//@href' % i))
+                data[u'title']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/text()'))
+                data[u'title_url']=extract_one(self.get_xp(publication, './/h4[@class="item-title"]/a/@href'))
+                data[u'source']=extract_one(self.get_xp(publication, './/h5[@class="item-subtitle"]//text()'))
+                #data[u'description']=' '.join((self.get_xp(publication, './/p[contains(@class,"description")]//text()')))
+                data[u'date']=extract_one(self.get_xp(publication, './/span[@class = "date-range"]//text()'))
+                data[u'authors']=self.get_xp(publication, './/dl[@class = "contributors"]//li//text()')
+                data[u'authors_linkedin_profile']=self.get_xp(publication, './/dl[@class = "contributors"]//li//@href')
                 publications.append(data)
-        else:
-            publications=[]
         return publications
 
     @property
     def similar_profiles(self):
         """ Get a list of dictionnaries of profiles from 'people also viewed' on linkedin """
-        if isinstance(self.xp_similar_profiles, html.HtmlElement) is True:
-            count=int(
-                self.get_clean_xpath('count(//div[@class="insights-browse-map"]/ul/li)'))
-            similar_profiles=[]
-            for i in range(1, count + 1):
+        similar_profiles = []
+        if len(self.xp_similar_profiles) > 0 :
+            for profile in self.xp_similar_profiles:
                 data={}
-                data[u'url']=extract_one(
-                    self.get_xp(self.xp_similar_profiles, './/li[%s]/h4/a/@href' % i))
-                data[u'name']=extract_one(
-                    self.get_xp(self.xp_similar_profiles, './/li[%s]/h4/a/text()' % i))
-                data[u'current_title']=extract_one(
-                    self.get_xp(self.xp_similar_profiles, './/li[%s]/p/text()' % i))
-                data[u'img_url']=extract_one(
-                    self.get_xp(self.xp_similar_profiles, './/li[%s]//a/img/@data-li-src' % i))
+                data[u'url']=extract_one(self.get_xp(profile, './div/h4/a/@href'))
+                data[u'name']=extract_one(self.get_xp(profile, './div/h4/a/text()'))
+                data[u'current_title']=extract_one(self.get_xp(profile, './div/p/text()'))
+                data[u'img_url']=extract_one(self.get_xp(profile, './a/img/@data-li-src'))
                 similar_profiles.append(data)
-        else:
-            similar_profiles=[]
         return similar_profiles
 
 
