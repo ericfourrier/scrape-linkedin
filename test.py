@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-u
 from pylinkedin.scraper import *
 from pylinkedin.utils import *
 import unittest
@@ -33,12 +35,6 @@ class TestUtils(unittest.TestCase):
         assert clean(3) == 3
         assert clean(3.0) == 3.0
 
-
-# class TestConnection(unittest.TestCase):
-
-#     def test_get_jeff_weiner(self):
-#         l = LinkedinItem(url="https://www.linkedin.com/in/jeffweiner08")
-#         self.assertEqual(l.response.status_code,200,msg = l.response.status_code)
 
 
 class TestLinkedinItem(unittest.TestCase):
