@@ -141,7 +141,9 @@ class LinkedinItem(object):
         # Skills
         self.xp_skills = self.tree.xpath('//section[@id = "skills"]/ul/li[@class="skill"]')
         # Organization
-        self.xp_organizations = self.tree.xpath('//section[@id = "organizations"]/ul/li')
+        self.xp_organizations = self.tree.xpath('//section[@id = "organizations"]//ul/li')
+        # Recommendations
+        self.xp_recommendations = self.tree.xpath('//section[@id = "recommendations"]//ul/li')
         # Summary
         # self.xp_summary = extract_one(self.tree.xpath('//div[@id = "summary"]'))
         # Recommendation
@@ -258,7 +260,7 @@ class LinkedinItem(object):
     @property
     def number_recommendations(self):
         """ Return the number of recommendations """
-        return extract_one(self.get_clean_xpath('//table[@class="extra-info"]//th[contains(text(),"Recommendations")]/following::td/strong[1]/text()'))
+        return extract_one(self.get_clean_xpath('//table[@class="extra-info"]//tr/th[contains(text(),"Recommandations") or contains(text(),"Recommendations") ]/following::td/strong[1]/text()'))
 
     # Interests, Groups  Skills  and Languages
     @property
@@ -469,6 +471,17 @@ class LinkedinItem(object):
                 data['description']=' '.join((self.get_xp(organization, './/p[contains(@class,"description")]//text()')))
                 organizations.append(data)
         return organizations
+
+    @property
+    def recommendations(self):
+        """ Return a list of dictionnary with organizations """
+        recommendations=[]
+        if len(self.xp_recommendations) > 0 :
+            for recommendation in self.xp_recommendations:
+                data = {}
+                data['text'] = extract_one(self.get_xp(recommendation, './/blockquote[@class="recommendation"]//text()'))
+                recommendations.append(data)
+        return recommendations
 
     @property
     def test_scores(self):
