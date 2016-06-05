@@ -88,7 +88,7 @@ class LinkedinItem(object):
     attributes_key = ['volunteerings', 'last_name', 'number_recommendations',
                      'number_connections', 'current_location', 'honors', 'first_name',
                      'current_title', 'test_scores', 'current_industry', 'languages',
-                     'similar_profiles', 'interests', 'profile_img_url', 'current_education',
+                     'similar_profiles', 'interests', 'has_profile_picture', 'current_education',
                      'educations', 'experiences', 'groups', 'organizations', 'certifications',
                      'name', 'skills', 'websites', 'summary', 'project', 'courses',
                      'publications', 'recommendations']
@@ -162,7 +162,7 @@ class LinkedinItem(object):
     def create_raw_path(self):
         """ Generate raw path as standard variables """
         # Header path
-        self.xp_header_raw = extract_one(self.tree.xpath('.//div[@class = "profile-card vcard"]'))
+        self.xp_header_raw = extract_one(self.tree.xpath('.//div[@class = "profile-overview"]'))
         # Experiences path
         self.xp_experiences_raw = extract_one(self.tree.xpath('//section[@id = "experience"]'))
         # Projets
@@ -203,8 +203,9 @@ class LinkedinItem(object):
         return extract_one(self.tree.xpath('.//head/link[@rel = "canonical"]/@href'))
 
     @property
-    def profile_img_url(self):
-        return extract_one(self.get_xp(self.xp_header, './/div[@class="profile-picture"]/a/img/@src'))
+    def has_profile_picture(self):
+        picture = self.tree.xpath('.//div[@class="profile-picture"]/a')
+        return True if picture else  False
 
     @property
     def name(self):
@@ -333,7 +334,8 @@ class LinkedinItem(object):
                 data['jobtitle_url'] = extract_one(
                     self.get_xp(experience, './/h4[@class="item-title"]/a/@href'))
                 data['company'] = extract_one(
-                    self.get_xp(experience, './/h5[@class="item-subtitle"]/a/text()'))
+
+                    self.get_xp(experience, './/h5[@class="item-subtitle"]//text()'))
                 data['linkedin_company_url'] = extract_one(
                     self.get_xp(experience, './/h5[@class="item-subtitle"]/a/@href'))
                 data['linkedin_company_img_url'] = extract_one(
@@ -370,7 +372,7 @@ class LinkedinItem(object):
                 data['linkedin_university_img_url'] = extract_one(self.get_xp(school,
                     './/h5[@class="logo"]/a/img/@src'))
                 data['description'] = extract_one(self.get_xp(
-                    school, './/h5[@class="item-subtitle"]//text()'))
+                    school, './/p[@class="description"]//text()'))
                 if data['description'] is not None:
                     data['degree'] = get_list_i(data['description'].split(','), 0)
                     data['major'] = get_list_i(data['description'].split(','), 1)
@@ -563,7 +565,7 @@ class LinkedinItem(object):
         'number_connections': self.number_connections,
         'number_recommendations': self.number_recommendations,
         'websites': self.websites,
-        'profile_img_url': self.profile_img_url,
+        'has_profile_picture': self.has_profile_picture,
         'current_education': self.current_education,
         'current_title': self.current_title,
         'current_location': self.current_location,

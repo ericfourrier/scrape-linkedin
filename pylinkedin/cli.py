@@ -19,7 +19,7 @@ from pprint import pprint
               default=None, help='Display only a specific attribute, display everything by default')
 #@click.option('--html', '-h', type=str, help='Raw html of the profile you want to scrape')
 def scrape(url, attribute):
-    """Simple program that greets NAME for a total of COUNT times."""
+    """Simple command line to """
     linkedin = LinkedinItem(url=url)
     if attribute is None:
         pprint(linkedin.to_dict())
