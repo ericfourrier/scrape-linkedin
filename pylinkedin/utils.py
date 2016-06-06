@@ -10,7 +10,7 @@ import time
 
 import requests
 from lxml import html
-
+from .exceptions import ServerIpBlacklisted, BadStatusCode, ProfileNotFound
 #########################################################
 # Helpers
 #########################################################
@@ -77,14 +77,31 @@ class CustomRequest(object):
     def set_random_proxy(self):
         self.proxy = random.choice(self.list_proxies)
 
+    def _get(self, url, *args, **kwargs):
+        """ Get helpers to handle exceptions """
+        try:
+            r = requests.get(url=url, *args, **kwargs)
+            if r.status_code == 999:
+                msg_error = "Linkedin forbids certain type of cloud provider to do raw https requests line Aws, Digital Ocean"
+                raise ServerIpBlacklisted(msg_error)
+            elif r.status_code == 404:
+                raise ProfileNotFound("The following url :{} can not be publicely found on Linkedin (404 error)".format(url))
+            elif r.status_code != 200:
+                raise BadStatusCode("The status code of the get requests is: {}".format(r.status_code))
+            return r
+        except requests.exceptions.Timeout:
+            raise Exception("Request timeout")
+        except requests.exceptions.RequestException as e:
+            print(e)
+
     def get(self, url, *args, **kwargs):
         if self.rotate_ua is True:
             self.set_random_ua()
         if self.list_proxies:
             self.set_random_proxy()
-            return requests.get(url=url, headers=self.headers, proxies=self.proxy, *args, **kwargs)
+            return self._get(url=url, headers=self.headers, proxies=self.proxy, *args, **kwargs)
         else:
-            return requests.get(url=url, headers=self.headers, *args, **kwargs)
+            return self._get(url=url, headers=self.headers, *args, **kwargs)
 
 # Read and write to a pretty json
 

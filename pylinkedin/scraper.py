@@ -18,6 +18,7 @@ Notes :
 # Packages
 
 from .utils import CustomRequest
+from .exceptions import ProfileNotFound, NotAProfile
 
 import time
 
@@ -99,15 +100,21 @@ class LinkedinItem(object):
         self.html_string = html_string
         if self.html_string is not None:
             self.tree = html.fromstring(self.html_string)
+
         # otherwise request the url
         elif self.html_string is None and self.url is not None:
             self.crequest = CustomRequest() if crequest is None else crequest
+            if 'linkedin.com/in' not in url:
+                raise NotAProfile("The url passed does not contain a valid lnkedin profile")
             self.response = self.crequest.get(self.url)
             self.tree = html.fromstring(self.response.text)
         else:
             raise ValueError('url or html_string should be defined')
+        # if extract_one(self.tree.xpath('.//div[@id="content"]/h1/text()')).strip() == "Profile Not Found":
+        #     raise ProfileNotFound("The following url :{} can not be publicely found on Linkedin".format(
+        #             self.url))
         # Header path
-        self.xp_header = extract_one(self.tree.xpath('.//div[@class = "profile-card vcard"]'))
+        self.xp_header = extract_one(self.tree.xpath('.//div[@class = "profile-overview"]'))
         # Experiences path
         self.xp_experiences = self.tree.xpath('//section[@id = "experience"]/ul/li[@class="position"]')
         # Projets
