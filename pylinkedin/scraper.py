@@ -379,7 +379,7 @@ class LinkedinItem(object):
                 data['linkedin_university_img_url'] = extract_one(self.get_xp(school,
                     './/h5[@class="logo"]/a/img/@src'))
                 data['description'] = extract_one(self.get_xp(
-                    school, './/p[@class="description"]//text()'))
+                    school, './/h5[@class="item-subtitle"]//text()'))
                 if data['description'] is not None:
                     data['degree'] = get_list_i(data['description'].split(','), 0)
                     data['major'] = get_list_i(data['description'].split(','), 1)
@@ -447,7 +447,7 @@ class LinkedinItem(object):
                 data['title']=extract_one(self.get_xp(honor, './/h4//text()'))
                 data['delivred_by']=extract_one(self.get_xp(honor, './/h5//text()'))
                 data['description']=' '.join((self.get_xp(honor, './/p[contains(@class,"description")]//text()')))
-                data['date']=extract_one(self.get_xp(honor, './/span[@class = "honor-date"]/time/text()'))
+                data['date']=extract_one(self.get_xp(honor, './/span[@class = "date-range"]/time[1]/text()'))
                 honors.append(data)
         return honors
 
