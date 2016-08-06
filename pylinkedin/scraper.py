@@ -222,13 +222,13 @@ class LinkedinItem(object):
     @property
     def first_name(self):
         """ Return first name """
-        first_name = self.name.split(' ', 1)[0] if self.name is not None else []
+        first_name = get_list_i(self.name.split(' ', 1), 0) if self.name is not None else None
         return first_name
 
     @property
     def last_name(self):
         """ Return last name of the profile """
-        last_name = self.name.split(' ', 1)[1] if self.name is not None else []
+        last_name = get_list_i(self.name.split(' ', 1), 1) if self.name is not None else None
         return last_name
 
     @property
@@ -312,7 +312,7 @@ class LinkedinItem(object):
     @property
     def summary(self):
         """ Return the summary of the linkedin profile """
-        return ' '.join(self.get_clean_xpath('//div[@id = "background-summary"]//div[@class = "summary"]/p//text()'))
+        return ' '.join(self.get_clean_xpath('//section[@id = "summary"]//div[@class = "description"]/p//text()'))
 
     @property
     def recommendations(self):
