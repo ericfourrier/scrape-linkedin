@@ -17,6 +17,10 @@ from .exceptions import ServerIpBlacklisted, BadStatusCode, ProfileNotFound
 
 # Requests with rotating proxies and user-agent
 
+def to_requests_format(ip, port):
+    """ Returns the proxy format for requests package """
+    return {'http': 'http://{}:{}'.format(ip, port),
+            'https': 'http://{}:{}'.format(ip, port)}
 
 class CustomRequest(object):
     """
@@ -35,7 +39,7 @@ class CustomRequest(object):
     A class with a get method that is just a customization of requests.get()
     """
 
-    def __init__(self, list_user_agent=None, rotate_ua=False, list_proxies=[]):
+    def __init__(self, list_user_agent=None, rotate_ua=False, list_proxies=None):
         if not list_user_agent:
             self.list_user_agent = [
                 "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1"
@@ -60,10 +64,10 @@ class CustomRequest(object):
         else:
             self.list_user_agent = list_user_agent
 
-        self.list_proxies = list_proxies
+        self.list_proxies = [] if not list_proxies else list_proxies
         self.rotate_ua = rotate_ua
-		# GoogleBot by default
-        self.headers = {'User-Agent': "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+        # GoogleBot by default
+        self.headers = {'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
                         'Accept-Encoding': 'none',
@@ -82,7 +86,7 @@ class CustomRequest(object):
         try:
             r = requests.get(url=url, *args, **kwargs)
             if r.status_code == 999:
-                msg_error = "Linkedin forbids certain type of cloud provider to do raw https requests line Aws, Digital Ocean"
+                msg_error = "Linkedin blacklists ips for unauthentified http requests, Aws, Digital Ocean"
                 raise ServerIpBlacklisted(msg_error)
             elif r.status_code == 404:
                 raise ProfileNotFound("The following url :{} can not be publicely found on Linkedin (404 error)".format(url))
@@ -127,22 +131,3 @@ def read_from_json(json_file_path):
 def create_search_url(list_keyword):
     return '%20'.join(list_keyword)
 
-
-def get_linkedin_url(list_keyword, *args, **kwargs):
-    """ This function will search the linkedin profile with duckduckgo with the requested
-    list_keyword and select the best result
-
-    Arguments
-    ---------
-    list_keyword : list of keywords (don't need to add linkedin on it)
-
-    """
-    if 'linkedin' not in [k.lower() for k in list_keyword]:
-        list_keyword.append('Linkedin')
-    url_to_get = self.url_ddg + \
-        self.create_search_url(list_keyword=list_keyword)
-    response = self.crequest.get(url_to_get)
-    hxs = html.fromstring(response.text)
-    url_to_follow = hxs.xpath(('(//div[@id = "links"]//' +
-                               'div[@class = "results_links results_links_deep web-result"])[1]//a[@class ="large"]/@href'))
-    return url_to_follow[0]
