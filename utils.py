@@ -21,3 +21,7 @@ def write_to_json(json_file_path, data):
 def join_keywords(l):
     """ join a list of keywords with '+' for BingSearch """
     return u'+'.join(l)
+
+def write_file(file, file_path):
+    with open(file_path, 'w') as f:
+        f.write(file)
