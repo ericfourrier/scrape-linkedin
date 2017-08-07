@@ -13,15 +13,17 @@ import click
 from .scraper import LinkedinItem
 from pprint import pprint
 
+
 def read_text(file_path):
     with open(file_path, 'r') as f:
         return f.read()
+
 
 @click.command()
 @click.option('--url', '-u', type=str, help='Url of the profile you want to scrape')
 @click.option('--attribute', '-a', type=click.Choice(LinkedinItem.attributes_key),
               default=None, help='Display only a specific attribute, display everything by default')
-@click.option('--file_path', '-f',type=click.Path(exists=True),default=None, help='Raw path to html of the profile you want to scrape')
+@click.option('--file_path', '-f', type=click.Path(exists=True), default=None, help='Raw path to html of the profile you want to scrape')
 def scrape(url, attribute, file_path):
     """Simple command line to scrape a profile"""
     if file_path is not None:
