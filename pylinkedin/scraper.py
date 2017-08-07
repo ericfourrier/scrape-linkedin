@@ -138,7 +138,7 @@ class LinkedinItem(object):
         # Courses
         self.xp_courses = self.tree.xpath('//section[@id = "courses"]/ul/li[@class="course"]')
         # Similar profiles
-        self.xp_similar_profiles = self.tree.xpath('//div[@class = "browse-map"]/ul/li[@class="profile-card"]')
+        self.xp_similar_profiles = self.tree.xpath('//div[contains(@class,"browse-map")]/ul/li[@class="profile-card"]')
         # Publications
         self.xp_publications = self.tree.xpath('//section[@id = "publications"]/ul/li[@class="publication"]')
         # Interests
@@ -193,7 +193,7 @@ class LinkedinItem(object):
         # Courses
         self.xp_courses_raw = extract_one(self.tree.xpath('//section[@id = "courses"]'))
         # Similar profiles
-        self.xp_similar_profiles_raw = extract_one(self.tree.xpath('//div[@class = "browse-map"]'))
+        self.xp_similar_profiles_raw = extract_one(self.tree.xpath('//div[contains(@class,"browse-map")]'))
         # Interests
         self.xp_interests_raw = extract_one(self.tree.xpath('//section[@id = "interests"]'))
         # Groups
@@ -294,7 +294,7 @@ class LinkedinItem(object):
     def skills(self):
         """ Return a list of skills """
         if len(self.xp_skills) > 0:
-            return [{'name': extract_one(self.get_xp(s, './a//text()')),
+            return [{'name': extract_one(self.get_xp(s, './span//text()')),
                     'url': extract_one(self.get_xp(s, './a/@href'))}
                     for s in self.xp_skills]
         else:
