@@ -58,15 +58,21 @@ It relies on two class:
     
     from pylinkedin.utils import CustomRequest
     c = CustomRequest() # default with rotating proxies
-    c = CustomRequest(rotating_ua = False) # without rotating proxies
+    c = CustomRequest(rotating_ua=False) # without rotating user-agent
     c = CustomRequest(list_proxies=[{'https':'http://186.233.94.106:8080',
     'http':'http://186.233.94.106:8080'}]))
 
 `LinkedinItem` is the main class, you can instantiate it with the URL of public profile using the `url` parameter, or with the HTML contents of the profile page, using `html_string`. See `test.py` for an example of using a save HTML file as input for the scrapper.
 
     from pylinkedin.scraper import LinkedinItem
-    l = LinkedinItem(url = 'https://www.linkedin.com/in/kennethreitz')
-    l = LinkedinItem(html_string = profile_string)
+    l = LinkedinItem(url='https://www.linkedin.com/in/kennethreitz')
+    l = LinkedinItem(html_string=profile_string)
+    
+You can customize your requests using `CustomRequest` class for `LinkedinItem`
+
+    c = CustomRequest(rotating_ua = True)
+    url_to_scrape = "https://www.linkedin.com/in/jeffweiner08"
+    l = LinkedinItem(url=url_to_scrape, crequest=c) # passing requests with rotating user-agent
 
 To use the `html_string`, make sure to browse to the public version of the profile page, as the private version will not work. The private version is the one showing the edit controls next to each section.  
 
@@ -75,9 +81,9 @@ To use the `html_string`, make sure to browse to the public version of the profi
     l.name # to get the name
     l.skills # to get the skills
     l.publications  # to get the publications
-    # etc
+    ...
     # the most important
-    l.to_dict() to scr# pylinkedin
+    l.to_dict() to get all infos
 
 
 ### Exhaustive list of the fields scraped
