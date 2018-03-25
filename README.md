@@ -58,7 +58,7 @@ It relies on two class:
     
     from pylinkedin.utils import CustomRequest
     c = CustomRequest() # default with rotating proxies
-    c = CustomRequest(rotating_ua=False) # without rotating user-agent
+    c = CustomRequest(rotate_ua=False) # without rotating user-agent
     c = CustomRequest(list_proxies=[{'https':'http://186.233.94.106:8080',
     'http':'http://186.233.94.106:8080'}]))
 
