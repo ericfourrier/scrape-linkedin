@@ -1,3 +1,5 @@
-requests>=2.0
+requests>=2.31.0
 lxml
 click
+certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
+idna>=3.7 # not directly required, pinned by Snyk to avoid a vulnerability
