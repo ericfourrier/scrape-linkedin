@@ -1,3 +1,4 @@
-requests>=2.0
+requests>=2.32.4
 lxml
 click
+urllib3>=2.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
